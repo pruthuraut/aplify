@@ -1,0 +1,10 @@
+[
+  {
+    "question": "Are you legally authorized to work in the United States?",
+    "answer": "Yes",
+    "type": "yes_no",
+    "company": null,
+    "aliases": [],
+    "added": "2026-01-01"
+  }
+]

@@ -1,5 +1,6 @@
 # Personal data - never commit
 profile/applicant_profile.json
+profile/learned_answers.json
 applications/
 resume-builder/base_resume.tex
 *.pdf

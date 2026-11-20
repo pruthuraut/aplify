@@ -7,7 +7,7 @@ Give it a job posting and it will:
 1. **Tailor your LaTeX resume** to the job description (ATS keywords, JD-driven ordering of experience and projects).
 2. **Build a single-page PDF whose height fits the content exactly**: same fonts, sizes, margins and width as your base resume; the page grows if content overflows and shrinks so there is no blank space under the last line.
 3. **Find hiring contacts** (recruiters, team members) with evidence and profile links.
-4. **Fill application forms** from your profile, stopping for your approval before anything is submitted or sent.
+4. **Fill application forms**: Simplify Copilot autofills first, the agent fills the rest from your profile and a learned-answers memory, and asks you only for questions it has never seen. Your answers are saved (`profile/answers.py`) so they're autofilled next time. It stops for your approval before anything is submitted or sent.
 5. **Track every application** in a CSV to avoid duplicates (with importers for Simplify, LinkedIn and Jobright history).
 
 ## Layout
@@ -19,8 +19,9 @@ Give it a job posting and it will:
 | `resume-builder/build_resume.py` | Fit-to-content LaTeX build script |
 | `Hiring Contact Finder/` | Plugin/skill for finding evidence-backed hiring contacts |
 | `profile/applicant_profile.example.json` | Template for your application-form answers |
+| `profile/answers.py` | Learned-answers memory: fuzzy lookup / add / list / forget for form questions |
 
-Personal files are git-ignored: `profile/applicant_profile.json`, `resume-builder/base_resume.tex`, `applications/` and all PDFs.
+Personal files are git-ignored: `profile/applicant_profile.json`, `profile/learned_answers.json`, `resume-builder/base_resume.tex`, `applications/` and all PDFs.
 
 ## Setup
 
