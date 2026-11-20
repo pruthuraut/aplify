@@ -1,0 +1,22 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "author": {
+    "email": "rautpruthu@gmail.com",
+    "name": "Pruthu Raut"
+  },
+  "description": "Find and rank evidence-backed hiring contacts for a pasted job posting, using available research tools.",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "category": "Productivity",
+        "defaultPrompt": "Find relevant hiring contacts for the job posting I paste. Rank people credibly tied to the company, team, role, or university recruiting, with evidence and profile links. Use an appropriate connected research app if available; offer approval before any required installation or connection, otherwise use an honest available fallback. Do not contact anyone without my approval.",
+        "developerName": "Pruthu Raut",
+        "displayName": "Hiring Contact Finder",
+        "longDescription": "Paste a job posting to find relevant team members, role recruiters, and university recruiters. Receive a concise ranked brief with evidence, profile links, confidence, and clear limitations. Uses appropriate connected research apps or available public web research; requests approval before new connections and never initiates outreach without explicit approval.",
+        "shortDescription": "Evidence-backed job contacts"
+      }
+    }
+  },
+  "name": "hiring-contact-finder",
+  "version": "0.1.0"
+}

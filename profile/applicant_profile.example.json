@@ -1,0 +1,95 @@
+{
+  "personal": {
+    "first_name": "TODO",
+    "last_name": "TODO",
+    "preferred_name": "TODO",
+    "email": "TODO",
+    "phone": "TODO",
+    "birthday": "TODO",
+    "location": "TODO",
+    "address": {
+      "line1": "TODO",
+      "line2": "TODO",
+      "city": "TODO",
+      "state": "TODO",
+      "postal_code": "TODO",
+      "country": "TODO"
+    },
+    "pronouns": "TODO"
+  },
+  "links": {
+    "linkedin": "TODO",
+    "github": "TODO",
+    "portfolio": "TODO",
+    "cves": [
+      "TODO"
+    ]
+  },
+  "work_authorization": {
+    "authorized_us": false,
+    "authorized_canada": false,
+    "authorized_uk": false,
+    "requires_sponsorship_now_or_future": false,
+    "visa_status": "TODO",
+    "us_citizen": "TODO",
+    "security_clearance_roles": false,
+    "willing_to_obtain_clearance": "TODO"
+  },
+  "eeo_voluntary": {
+    "ethnicity": "TODO",
+    "hispanic_or_latino": "TODO",
+    "gender": "TODO",
+    "lgbtq": false,
+    "disability": false,
+    "veteran": false
+  },
+  "education": [
+    {
+      "school": "TODO",
+      "degree": "TODO",
+      "start": "TODO",
+      "end": "TODO",
+      "gpa": "TODO"
+    }
+  ],
+  "experience": [
+    {
+      "company": "TODO",
+      "title": "TODO",
+      "location": "TODO",
+      "start": "TODO",
+      "end": "TODO",
+      "type": "TODO"
+    }
+  ],
+  "certifications": [
+    "TODO"
+  ],
+  "job_preferences": {
+    "role_types": [
+      "TODO"
+    ],
+    "levels": [
+      "TODO"
+    ],
+    "role_categories": [
+      "TODO"
+    ],
+    "company_size": "TODO",
+    "industries": [
+      "TODO"
+    ],
+    "earliest_start_date": "TODO",
+    "willing_to_relocate": "TODO",
+    "work_mode": "TODO",
+    "preferred_locations": "TODO",
+    "salary_expectation": "TODO"
+  },
+  "common_questions": {
+    "how_did_you_hear": "TODO",
+    "previously_worked_here": "TODO",
+    "age_18_or_over": false,
+    "can_pass_background_check": "TODO"
+  },
+  "_note": "Copy to applicant_profile.json (git-ignored) and fill in. Used to answer job-application forms."
+}
