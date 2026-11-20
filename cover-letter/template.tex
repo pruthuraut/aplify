@@ -1,0 +1,30 @@
+% Cover letter template. <<PLACEHOLDERS>> in the header are filled from
+% profile/applicant_profile.json by build_cover_letter.py. Write only the body.
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.8in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{parskip}
+\usepackage[hidelinks]{hyperref}
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+{\Huge\bfseries <<NAME>>} \\[0.3em]
+<<CONTACT_LINE>>
+\end{center}
+
+\vspace{0.5em}
+<<DATE>>
+
+<<COMPANY_BLOCK>>
+
+\vspace{0.3em}
+Dear <<GREETING>>,
+
+<<BODY>>
+
+Sincerely, \\
+<<NAME>>
+
+\end{document}
