@@ -1,6 +1,6 @@
 # aplify
 
-An agent-driven job application workflow for [Claude Code](https://claude.com/claude-code) (also works with other agents that read `SKILL.md` files, such as Codex or OpenCode).
+An agent-driven job application workflow for [Claude Code](https://claude.com/claude-code), [Codex CLI](https://github.com/openai/codex) and [Gemini CLI](https://github.com/google-gemini/gemini-cli). All three follow the same instructions in `AGENTS.md`.
 
 Give it a job posting and it will:
 
@@ -15,7 +15,10 @@ Give it a job posting and it will:
 
 | Path | What it is |
 |---|---|
-| `CLAUDE.md` | The workflow and approval rules the agent follows |
+| `AGENTS.md` | The workflow and approval rules every agent follows |
+| `CLAUDE.md`, `GEMINI.md` | Thin pointers that import `AGENTS.md` for Claude Code / Gemini CLI |
+| `.gemini/settings.json` | Gemini CLI: Playwright MCP browser server for this project |
+| `setup/agent_setup.py` | Registers Playwright MCP with Codex and checks prerequisites |
 | `resume-builder/SKILL.md` | Resume-tailoring skill (prompt + build step) |
 | `resume-builder/build_resume.py` | Fit-to-content LaTeX build script |
 | `cover-letter/` | Cover-letter skill, LaTeX template and one-page build script |
@@ -31,6 +34,22 @@ Personal files are git-ignored: `profile/applicant_profile.json`, `profile/learn
 2. Put your resume at `resume-builder/base_resume.tex`. Its `\usepackage[...]{geometry}` line must include a `paperheight=`.
 3. Copy `profile/applicant_profile.example.json` to `profile/applicant_profile.json` and fill it in.
 4. Open the folder in Claude Code and paste a job posting or URL.
+
+## Using Codex CLI or Gemini CLI
+
+Claude Code drives the browser with Claude in Chrome. Codex and Gemini use
+[Playwright MCP](https://github.com/microsoft/playwright-mcp) (free, open source) in **extension mode**, so they
+control your everyday Chrome where you're signed in and Simplify is installed.
+
+1. Install Node.js, plus `codex` (`npm i -g @openai/codex`) and/or `gemini` (`npm i -g @google/gemini-cli`).
+2. Run `python setup/agent_setup.py`. It adds the `playwright` MCP server to Codex; Gemini picks it up from
+   `.gemini/settings.json` automatically.
+3. In Chrome, install the **Playwright MCP Bridge** extension (Chrome Web Store, by Microsoft). When the agent first
+   opens the browser, the extension asks which tab to share.
+4. Run `codex` or `gemini` from this folder and paste a job posting.
+
+If the agent can't click the Simplify panel (it belongs to another extension), it asks you to click
+**Autofill**, then continues filling the rest of the form.
 
 ## Building a resume manually
 
