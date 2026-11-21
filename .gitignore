@@ -23,3 +23,6 @@ __pycache__/
 
 # Playwright MCP page snapshots/screenshots (may contain personal form data)
 .playwright-mcp/
+
+# Throwaway per-job helper scripts written by agents
+scratch/

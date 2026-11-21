@@ -1,12 +1,13 @@
-"""Set up aplify for Codex CLI and/or Gemini CLI with Playwright MCP (extension mode).
+"""Set up aplify's browser control for Codex CLI, Antigravity CLI (agy) and/or Gemini CLI.
 
-Usage:  python setup/agent_setup.py [--codex] [--gemini]      (no flag = both)
+Usage:  python setup/agent_setup.py [--codex] [--agy] [--gemini]      (no flag = all)
 
-- Codex: registers a global MCP server "playwright" (`codex mcp add ...`) unless one already exists.
-- Gemini: the project already ships .gemini/settings.json (MCP server) and GEMINI.md (imports AGENTS.md);
-  this only checks that the `gemini` command is installed.
-Both then need the "Playwright MCP Bridge" Chrome extension so the agent can drive YOUR Chrome
-(your logins + Simplify). Nothing here is paid: Playwright MCP is open source (Apache-2.0).
+Primary browser server: Browser MCP (https://browsermcp.io/, `@browsermcp/mcp@latest`), which drives YOUR Chrome
+(your logins + Simplify) in its own tab group. Fallback: Playwright MCP in extension mode.
+- Codex / agy: registers the `browsermcp` and `playwright` MCP servers unless they already exist.
+- Gemini: the project ships .gemini/settings.json (both servers) and GEMINI.md; this only checks `gemini` exists.
+Then install the "Browser MCP" Chrome extension and click Allow the first time an agent connects.
+Nothing here is paid.
 """
 import argparse
 import shutil
@@ -14,58 +15,81 @@ import subprocess
 import sys
 from pathlib import Path
 
-PKG = "@playwright/mcp@0.0.86"
-SERVER = ["npx", "-y", PKG, "--extension"]
+SERVERS = {
+    "browsermcp": ["npx", "@browsermcp/mcp@latest"],
+    "playwright": ["npx", "-y", "@playwright/mcp@0.0.86", "--extension"],  # fallback
+}
 
 
-def have(cmd: str) -> bool:
-    return shutil.which(cmd) is not None
+def find(cmd: str, default: Path = None):
+    path = shutil.which(cmd)
+    if path:
+        return path
+    return str(default) if default and default.exists() else None
 
 
 def run(cmd: list) -> subprocess.CompletedProcess:
     return subprocess.run(cmd, capture_output=True, text=True, shell=sys.platform == "win32")
 
 
+def register(label: str, exe: str, add_cmd) -> None:
+    """add_cmd(name, server_args) -> full command list for that CLI."""
+    listed = run([exe, "mcp", "list"]).stdout
+    for name, server in SERVERS.items():
+        if name in listed:
+            print(f"[{label}] MCP server '{name}' already configured.")
+            continue
+        r = run(add_cmd(name, server))
+        print(f"[{label}] added MCP server '{name}'." if r.returncode == 0
+              else f"[{label}] adding '{name}' failed:\n{r.stderr or r.stdout}")
+
+
 def setup_codex() -> None:
-    if not have("codex"):
+    exe = find("codex")
+    if not exe:
         print("[codex] not installed - install it (e.g. `npm i -g @openai/codex`) and rerun.")
         return
-    if run(["codex", "mcp", "get", "playwright"]).returncode == 0:
-        print("[codex] MCP server 'playwright' already configured - leaving it as is.")
+    register("codex", exe, lambda name, server: [exe, "mcp", "add", name, "--", *server])
+
+
+def setup_agy() -> None:
+    exe = find("agy", Path.home() / "AppData" / "Local" / "agy" / "bin" / "agy.exe")  # Windows install location
+    if not exe:
+        print("[agy] not found - install Antigravity CLI and run `agy install`, then rerun.")
         return
-    r = run(["codex", "mcp", "add", "playwright", "--", *SERVER])
-    print("[codex] added MCP server 'playwright'." if r.returncode == 0 else f"[codex] failed:\n{r.stderr or r.stdout}")
+    register("agy", exe, lambda name, server: [exe, "mcp", "add", name, *server])
 
 
 def setup_gemini() -> None:
-    if have("gemini"):
-        print("[gemini] installed; .gemini/settings.json in this folder adds the Playwright MCP server.")
+    if find("gemini"):
+        print("[gemini] installed; .gemini/settings.json in this folder adds Browser MCP + Playwright MCP.")
     else:
-        print("[gemini] not installed - install it with `npm i -g @google/gemini-cli`; "
-              ".gemini/settings.json in this folder already configures Playwright MCP.")
+        print("[gemini] not installed - `npm i -g @google/gemini-cli`; .gemini/settings.json already configures it.")
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--codex", action="store_true")
-    ap.add_argument("--gemini", action="store_true")
+    for flag in ("--codex", "--agy", "--gemini"):
+        ap.add_argument(flag, action="store_true")
     a = ap.parse_args()
-    both = not (a.codex or a.gemini)
-    if not have("npx"):
-        sys.exit("Node.js (npx) is required: https://nodejs.org/")
+    every = not (a.codex or a.agy or a.gemini)
+    if not shutil.which("npx"):
+        sys.exit("Node.js 20+ (npx) is required: https://nodejs.org/")
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "resume-builder"))
     from build_resume import find_pdflatex  # also finds per-user MiKTeX installs not on PATH
     try:
         find_pdflatex()
     except SystemExit:
         print("warning: pdflatex not found (needed for resume/cover-letter builds) - install MiKTeX or TeX Live.")
-    if both or a.codex:
+    if every or a.codex:
         setup_codex()
-    if both or a.gemini:
+    if every or a.agy:
+        setup_agy()
+    if every or a.gemini:
         setup_gemini()
-    print("\nLast step (once): install the 'Playwright MCP Bridge' extension in the Chrome you use for job sites,\n"
-          "stay logged in there, and keep Simplify installed. When the agent first connects, the extension asks\n"
-          "which tab to share - pick it. Then run `codex` or `gemini` from this folder.")
+    print("\nLast step (once): install the 'Browser MCP' extension (https://browsermcp.io/) in the Chrome you use for\n"
+          "job sites, pin it, stay logged in, and keep Simplify installed. The first time an agent connects it shows a\n"
+          "six-digit code: check the extension popup shows the same code and click Allow.")
 
 
 if __name__ == "__main__":

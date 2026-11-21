@@ -1,6 +1,6 @@
 # aplify
 
-An agent-driven job application workflow for [Claude Code](https://claude.com/claude-code), [Codex CLI](https://github.com/openai/codex) and [Gemini CLI](https://github.com/google-gemini/gemini-cli). All three follow the same instructions in `AGENTS.md`.
+An agent-driven job application workflow for [Claude Code](https://claude.com/claude-code), [Codex CLI](https://github.com/openai/codex), Antigravity CLI and [Gemini CLI](https://github.com/google-gemini/gemini-cli). All of them follow the same instructions in `AGENTS.md`.
 
 Give it a job posting and it will:
 
@@ -17,8 +17,8 @@ Give it a job posting and it will:
 |---|---|
 | `AGENTS.md` | The workflow and approval rules every agent follows |
 | `CLAUDE.md`, `GEMINI.md` | Thin pointers that import `AGENTS.md` for Claude Code / Gemini CLI |
-| `.gemini/settings.json` | Gemini CLI: Playwright MCP browser server for this project |
-| `setup/agent_setup.py` | Registers Playwright MCP with Codex and checks prerequisites |
+| `.gemini/settings.json` | Gemini CLI: Browser MCP (and Playwright MCP fallback) servers for this project |
+| `setup/agent_setup.py` | Registers Browser MCP with Codex/agy and checks prerequisites |
 | `resume-builder/SKILL.md` | Resume-tailoring skill (prompt + build step) |
 | `resume-builder/build_resume.py` | Fit-to-content LaTeX build script |
 | `cover-letter/` | Cover-letter skill, LaTeX template and one-page build script |
@@ -35,21 +35,24 @@ Personal files are git-ignored: `profile/applicant_profile.json`, `profile/learn
 3. Copy `profile/applicant_profile.example.json` to `profile/applicant_profile.json` and fill it in.
 4. Open the folder in Claude Code and paste a job posting or URL.
 
-## Using Codex CLI or Gemini CLI
+## Using Codex CLI, Antigravity CLI or Gemini CLI
 
-Claude Code drives the browser with Claude in Chrome. Codex and Gemini use
-[Playwright MCP](https://github.com/microsoft/playwright-mcp) (free, open source) in **extension mode**, so they
-control your everyday Chrome where you're signed in and Simplify is installed.
+Claude Code drives the browser with Claude in Chrome. Codex, Antigravity (`agy`) and Gemini use
+[Browser MCP](https://browsermcp.io/), which controls your everyday Chrome (signed in, with Simplify installed) in its
+own tab group. It answers each action with one line instead of a full page snapshot, so long forms like Workday take
+far fewer tokens and round trips than Playwright MCP.
 
-1. Install Node.js, plus `codex` (`npm i -g @openai/codex`) and/or `gemini` (`npm i -g @google/gemini-cli`).
-2. Run `python setup/agent_setup.py`. It adds the `playwright` MCP server to Codex; Gemini picks it up from
-   `.gemini/settings.json` automatically.
-3. In Chrome, install the **Playwright MCP Bridge** extension (Chrome Web Store, by Microsoft). When the agent first
-   opens the browser, the extension asks which tab to share.
-4. Run `codex` or `gemini` from this folder and paste a job posting.
+1. Install Node.js 20+, plus `codex`, `agy` and/or `gemini`.
+2. Install the **Browser MCP** extension in Chrome (from [browsermcp.io](https://browsermcp.io/)) and pin it.
+3. Run `python setup/agent_setup.py`. It adds the `browsermcp` MCP server to Codex and agy (Playwright MCP stays as a
+   fallback); Gemini picks both up from `.gemini/settings.json`.
+4. Run the agent from this folder and paste a job posting. The first time, it shows a six-digit code: check that the
+   extension popup shows the same code and click **Allow**. **Stop** in the popup pauses the agent at any time.
 
 If the agent can't click the Simplify panel (it belongs to another extension), it asks you to click
 **Autofill**, then continues filling the rest of the form.
+
+The previous Playwright-MCP-first setup is kept on the `playwright-mcp-setup` branch.
 
 ## Building a resume manually
 
