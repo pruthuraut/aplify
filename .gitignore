@@ -20,3 +20,6 @@ Thumbs.db
 .vscode/
 .claude/settings.local.json
 __pycache__/
+
+# Playwright MCP page snapshots/screenshots (may contain personal form data)
+.playwright-mcp/
