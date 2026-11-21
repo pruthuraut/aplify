@@ -43,11 +43,22 @@ SYNONYMS = [
     (r"\breferred\b|\bsource\b|\bfind out\b|\blearn about\b|\bhear about\b", " hear "),
     (r"\bimmigration\b|\bwork permit\b", " visa "),
     (r"\b(at least |over |older than )?18( years)?( of age| old)?( or older)?\b", " adult18 "),
-    (r"\btop secret\b|\bts sci\b|\bts\b|\bsecret\b|\bsecurity clearance\b", " clearance "),
+    (r"\btop secret\b|\bts sci\b|\bts\b|(?<!trade )\bsecret\b|\bsecurity clearance\b", " clearance "),
+    (r"\bnon ?compete\b|\bnon ?solicit\w*\b|\btrade secrets?\b|\brestrictive covenants?\b|\bemployment covenants?\b",
+     " noncompete "),
+    (r"\bself ?employed\b|\bown(ed)? (your )?(own )?(business|company)\b|\bbusiness owner\b", " selfemployed "),
+    (r"\boutside employment\b|\bsecond job\b|\bother (outside )?(jobs?|employment)\b|\bmoonlight\w*\b", " outsidejob "),
+    (r"\b(immediate |extended )?family( members?)?\b|\brelatives?\b|\brelated to\b|\bspouse\b|\bpartner\b"
+     r"|\bparents?\b|\bchild(ren)?\b|\bsiblings?\b|\bin ?laws?\b", " relative "),
+    (r"\bwork(s|ing)? (for|at)\b|\bemployed (by|at|with)\b|\bemployees? (of|at)\b", " employed "),
 ]
+CONCEPTS = {rep.strip() for _, rep in SYNONYMS if rep.strip()}
+CONCEPT_WEIGHT = 3
 STOP = set("a an the to for of in at on by this that with your you what which is be or and are am "
            "do does did have has will would can could how i my we our please position role job "
-           "company opportunity status employment if any when date current currently active about".split())
+           "company opportunity status employment if any when date current currently active about "
+           "ever anyone someone know firm organization employer agreement agreements subject bound "
+           "now past who including there other".split())
 
 
 def tokens(q: str) -> set:
@@ -59,17 +70,20 @@ def similarity(a: str, b: str) -> float:
     ta, tb = tokens(a), tokens(b)
     if not ta or not tb:
         return seq
-    inter = len(ta & tb)
-    jacc = inter / len(ta | tb)
-    # containment only counts when the shorter question has 2+ meaningful words
-    cont = inter / min(len(ta), len(tb)) if min(len(ta), len(tb)) >= 2 else jacc
+    # concept words produced by SYNONYMS (e.g. "sponsor", "relative") carry the meaning, so weigh them more
+    w = lambda ts: sum(CONCEPT_WEIGHT if t in CONCEPTS else 1 for t in ts)
+    inter = w(ta & tb)
+    jacc = inter / w(ta | tb)
+    # containment only counts when the shorter question has 2+ meaningful words (or one concept word)
+    short = min(w(ta), w(tb))
+    cont = inter / short if short >= 2 else jacc
     tok = 0.5 * jacc + 0.5 * cont
     # character similarity alone is misleading ("travel" vs "relocate"), so only trust it when near-identical
     return max(seq, tok) if seq >= 0.9 else tok
 
 
 def norm(q: str) -> str:
-    q = q.lower()
+    q = q.lower().replace("-", " ").replace("‑", " ")
     q = re.sub(r"\*|\(required\)|\(optional\)", " ", q)
     for pat, rep in SYNONYMS:
         q = re.sub(pat, rep, q)
@@ -88,6 +102,8 @@ def save(items: list) -> None:
 
 
 def best_match(items, question, company=None):
+    if company:  # the company's own name carries no meaning for matching
+        question = re.sub(re.escape(company), " the company ", question, flags=re.I)
     best, score = None, 0.0
     for it in items:
         if it.get("company") and (not company or it["company"].lower() != company.lower()):
