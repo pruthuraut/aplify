@@ -46,6 +46,15 @@ Given a job posting (text or URL):
 ## Browser tools
 The agent must drive the user's own Chrome (their logins + the Simplify extension live there).
 - **Claude Code**: Claude in Chrome (`mcp__claude-in-chrome__*`).
+- **Antigravity CLI (agy)**: use the built-in `/browser` subagent (Chrome DevTools MCP, drives the user's own
+  running Chrome; faster than Playwright). One-time setup: Chrome 144+, open `chrome://inspect/#remote-debugging`
+  and turn on "Allow remote debugging for this browser instance"; the user clicks **Allow** when Chrome asks.
+  - Give each `/browser` task one page/step with a clear end condition, the absolute file paths to upload, and
+    the known answers, e.g. "fill <url> with these values, attach <abs path>, STOP before Submit and report every
+    empty or uncertain field". Never let it click Submit/Send without the user's approval (step 4).
+  - If it can't click the Simplify panel, ask the user to click Autofill, then continue from step 3b.
+  - Fall back to the Playwright MCP tools below if `/browser` is unavailable or a step fails twice.
+  - Remind the user to turn remote debugging off when done (any local program can control Chrome while it's on).
 - **Codex CLI / Gemini CLI**: Playwright MCP in extension mode (`@playwright/mcp --extension`), connected to the
   user's Chrome through the "Playwright MCP Bridge" extension (setup: `python setup/agent_setup.py`).
   Useful tools: `browser_navigate`, `browser_snapshot` (read the page + element refs), `browser_click`,

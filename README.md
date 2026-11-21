@@ -48,6 +48,18 @@ control your everyday Chrome where you're signed in and Simplify is installed.
    opens the browser, the extension asks which tab to share.
 4. Run `codex` or `gemini` from this folder and paste a job posting.
 
+### Antigravity CLI (agy): use `/browser` (faster)
+
+agy has a built-in browser subagent that drives your own running Chrome through Chrome DevTools MCP, which is
+quicker than Playwright on long forms like Workday. One-time setup:
+
+1. Use Chrome 144 or newer and install Node.js (`npx` launches the DevTools MCP server).
+2. Open `chrome://inspect/#remote-debugging` and turn on **Allow remote debugging for this browser instance**.
+3. Run `agy` from this folder and paste a job posting. When Chrome asks to allow remote debugging, click **Allow**.
+
+While remote debugging is on, any program on your computer can control that Chrome, so turn it off when you're
+done. The Playwright MCP server stays configured as a fallback.
+
 If the agent can't click the Simplify panel (it belongs to another extension), it asks you to click
 **Autofill**, then continues filling the rest of the form.
 
