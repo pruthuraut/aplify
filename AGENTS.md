@@ -14,6 +14,8 @@ Given a job posting (text or URL):
    from the JD + tailored resume, then `python cover-letter/build_cover_letter.py <that .json>` (must be 1 page).
 2. **Contacts** - follow `Hiring Contact Finder/skills/find-hiring-contacts/SKILL.md`. Save the brief to
    `applications/<company>-<role>/contacts.md`.
+2b. **Outreach** - follow `outreach/SKILL.md`: draft <=300-char LinkedIn connection notes for 5-6 contacts,
+   get the user's approval of the exact notes, then send them (paced, <=15/day, <=80/week); log in `applications/outreach.csv`.
 3. **Application forms** - Simplify first, then memory, then ask (browser: see "Browser tools" below):
    a. Open the application page. Use the Simplify Copilot extension panel to autofill
       (click "Autofill" / "Autofill This Page" in the Simplify sidebar) and wait for it to finish.
@@ -52,4 +54,5 @@ The agent must drive the user's own Chrome (their logins + the Simplify extensio
   - The Simplify panel is drawn by another extension and may not be clickable from Playwright. If clicking
     "Autofill" fails, ask the user to click it, wait for them to say it finished, then continue from step 3b.
   - `browser_file_upload` needs absolute paths, e.g. the PDFs in `applications/<job>/`.
-- LinkedIn is read-only: never apply, message or connect through automation there.
+- LinkedIn: read profiles/jobs, and send ONLY user-approved connection invites (step 2b, within its limits).
+  Never apply, message, follow, endorse or do anything else there.
