@@ -6,7 +6,7 @@ description: Write a one-page, job-specific cover letter (PDF) and draft answers
 # Cover letter + open-ended answers
 
 Inputs: the job description (`applications/<job>/job_description.txt` or the posting) and the tailored
-resume (`applications/<job>/Pruthu_Raut_Resume.tex`). Research the company briefly (official site,
+resume (`applications/<job>/<First>_<Last>_Resume.tex`). Research the company briefly (official site,
 product/security blog, recent news) only for facts you can cite; never invent them.
 
 ## Cover letter

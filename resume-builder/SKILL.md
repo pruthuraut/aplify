@@ -1,6 +1,6 @@
 ---
 name: resume-builder
-description: Tailor Pruthu's LaTeX resume to a job description (ATS-optimized) and build it into a fitted single-page PDF. Use whenever a job posting/URL is given and a resume is needed.
+description: Tailor the user's LaTeX resume to a job description (ATS-optimized) and build it into a fitted single-page PDF. Use whenever a job posting/URL is given and a resume is needed.
 ---
 Here's the standalone prompt, updated to fold in the Nightcrawler project and to explicitly instruct picking/emphasizing experience and projects based on the JD:
 📄 Prompt to Optimize Resume for ATS
@@ -48,8 +48,8 @@ The master resume is `base_resume.tex` (in this folder). Always start from it. N
 document class, packages, fonts, font sizes, margins, page width, macros or spacing - only content.
 
 ## Build (required every time)
-1. Save the tailored resume to `../applications/<company>-<role>/Pruthu_Raut_Resume.tex`.
-2. Run: `python build_resume.py ../applications/<company>-<role>/Pruthu_Raut_Resume.tex`
+1. Save the tailored resume to `../applications/<company>-<role>/<First>_<Last>_Resume.tex`.
+2. Run: `python build_resume.py ../applications/<company>-<role>/<First>_<Last>_Resume.tex`
 3. The script keeps everything identical and only sets `paperheight` so the PDF is exactly
    ONE page whose height ends right after the last line (+ the 0.2in margin):
    too long -> page grows to fit; too short -> page shrinks so there is no blank space.

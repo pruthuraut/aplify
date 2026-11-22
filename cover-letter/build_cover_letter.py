@@ -11,7 +11,7 @@ cover_letter.json:
 }
 
 Header (name, email, phone, links) comes from profile/applicant_profile.json.
-Writes Pruthu_Raut_Cover_Letter.tex/.pdf next to the JSON. Fonts, size and margins are fixed by
+Writes <First>_<Last>_Cover_Letter.tex/.pdf next to the JSON. Fonts, size and margins are fixed by
 the template and never shrunk: if the letter runs past one page the build fails and the text must
 be shortened.
 """

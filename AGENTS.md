@@ -8,7 +8,7 @@ Given a job posting (text or URL):
    skip (log as `skipped_ineligible`) roles that require US citizenship, a security clearance, or that the
    profile otherwise rules out. Tell the user why.
 1. **Resume** - follow `resume-builder/SKILL.md`. Start from `resume-builder/base_resume.tex`, tailor content only,
-   save to `applications/<company>-<role>/Pruthu_Raut_Resume.tex`, then ALWAYS build with
+   save to `applications/<company>-<role>/<First>_<Last>_Resume.tex` (name from `profile/applicant_profile.json`), then ALWAYS build with
    `python resume-builder/build_resume.py <that .tex>` (single page, height fitted to content, same fonts/sizes).
 1b. **Cover letter** - follow `cover-letter/SKILL.md`: write `applications/<company>-<role>/cover_letter.json`
    from the JD + tailored resume, then `python cover-letter/build_cover_letter.py <that .json>` (must be 1 page).
@@ -33,7 +33,7 @@ Given a job posting (text or URL):
       5. Multi-page forms (Workday, iCIMS, etc.): repeat steps 2-3 on EVERY new page/step before filling it.
       Only after that, read the form (step b) and fill just the gaps.
       Then REPLACE whatever resume/cover letter Simplify attached with this job's tailored files
-      (`Pruthu_Raut_Resume.pdf`, `Pruthu_Raut_Cover_Letter.pdf`) using the browser's file-upload tool, and confirm
+      (`<First>_<Last>_Resume.pdf`, `<First>_<Last>_Cover_Letter.pdf`) using the browser's file-upload tool, and confirm
       the form shows the new filenames. If the form has a cover-letter text box instead of an upload, paste the letter text.
    b2. Open-ended questions ("Why this company/role?", "Describe a project...", "Anything else?"):
       draft answers from the JD + resume per `cover-letter/SKILL.md`, save to `applications/<job>/answers.md`.
@@ -62,13 +62,46 @@ Given a job posting (text or URL):
    without explicit approval of the exact content. Show the filled form / draft first. Never type passwords,
    create accounts, or accept terms/consent checkboxes without asking (except the application privacy
    acknowledgments pre-approved in step 3c2); the user signs in themselves.
+4b. **Portal sign-in screens** (Oracle "You don't need an account - just use your email", iCIMS, Workday, Taleo, etc.):
+   - Email-only entry (no password field): type the `email` from `profile/applicant_profile.json` and continue. Ask
+     before ticking any terms box on that screen, as in step 4.
+   - A verification / one-time code is sent: stop and ask the user once - "<Company> sent a code to your email; enter
+     it in the open tab and tell me when done" - then continue. Never open the user's mailbox to read codes.
+   - A password or account creation is required: stop and ask the user to sign in or create the account themselves
+     (their password manager can fill it). Never type, store or log passwords.
+   - Meanwhile, continue with other work (e.g. build the next job's resume) instead of idling.
+4c. **Login queue** - a portal that needs sign-in, account creation or a code never blocks a run:
+   1. Do everything that needs no login first: eligibility, tailored resume + cover letter, draft answers for any
+      questions visible on the public posting.
+   2. Add the job to `applications/login_queue.md` (one row: date, company, role, portal type, apply URL, what the
+      user must do, prep status) and set its tracker status to `queued_login`. Then move on to the next job.
+   3. At the end of the run (or when asked), show the queue grouped by portal - one login per portal usually covers
+      all its jobs - and ask the user to sign in to them in one sitting (tick "Keep me signed in"; a saved password
+      makes it one click).
+   4. When the user says "done" (or names portals), work through the queued jobs on those portals: Simplify first,
+      fill, upload, show the summary for approval (step 3g), then remove the row from the queue and update the tracker.
+   Same for portals that are temporarily down (note "retry") and CAPTCHAs that appear mid-form (note "captcha").
 5. Log every application in `applications/tracker.csv` (date, company, role, url, status, contacts, notes);
    check it first to avoid duplicates.
 
 ## Browser tools
 The agent must drive the user's own Chrome (their logins + the Simplify extension live there).
 - **Claude Code**: Claude in Chrome (`mcp__claude-in-chrome__*`).
-- **Codex CLI / Antigravity CLI (agy) / Gemini CLI**: [Browser MCP](https://browsermcp.io/) (`@browsermcp/mcp@latest`,
+- **Antigravity CLI (agy)**: [Chrome DevTools MCP](https://github.com/ChromeDevTools/chrome-devtools-mcp)
+  (server `chrome-devtools`, `chrome-devtools-mcp --autoConnect`), attached to the user's running Chrome - never a
+  browser it launches itself (that profile has no logins and no Simplify). Setup: `python setup/agent_setup.py --agy`;
+  the user enables chrome://inspect/#remote-debugging once and clicks Allow when agy connects.
+  - Read: `take_snapshot` (a11y tree with uids; much smaller than screenshots - prefer it), `list_pages` / `select_page`.
+    Act: `navigate_page`, `new_page`, `click`, `fill`, `fill_form` (many fields in one call), `hover`, `press_key`,
+    `upload_file` (uid of the file input + absolute path to the PDF in `applications/<job>/`), `wait_for` (text),
+    `handle_dialog` (never accept a submit/confirm dialog without approval).
+  - Simplify (step 3a): `evaluate_script` with the same function as the Browser MCP `eval` below, then poll the
+    "Autofill complete" check the same way. Elements inside shadow roots or custom dropdowns that `click`/`fill` can't
+    reach: use `evaluate_script` to click the option, or `take_snapshot` again and use the new uid.
+  - Re-uploading a resume can make some ATS (Lever, Workday) re-parse it and overwrite fields you already set -
+    always re-read the form after an upload and fix them.
+  - Fallback: Browser MCP (below), then Playwright MCP.
+- **Codex CLI / Gemini CLI** (and agy's fallback): [Browser MCP](https://browsermcp.io/) (`@browsermcp/mcp@latest`,
   server name `browsermcp`) with the Browser MCP Chrome extension (setup: `python setup/agent_setup.py`).
   It works in its own tab group in the user's Chrome, signed in where they are.
   - One `browser` tool that takes command lines; put several lines in one call when you can predict the steps
