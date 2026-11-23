@@ -1,5 +1,9 @@
 # aplify
 
+[![aplify in 20 seconds](docs/aplify-demo.gif)](docs/aplify-demo.mp4)
+
+<sub>20-second demo (click for the MP4 with sound). Everyone in it is fictional.</sub>
+
 Paste a job link into your AI coding agent and aplify does the busywork of applying:
 
 1. **Checks** the job against your tracker (no duplicates) and skips roles you're not eligible for (citizenship, clearance).
